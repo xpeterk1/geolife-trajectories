@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 
 #include <iostream>
+#include "opengl/Shader.h"
+#include "model/Map.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -12,15 +14,16 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Geolife Trajectories", NULL, NULL);
+
+    GLFWwindow* window = glfwCreateWindow(800, 800, "Geolife Trajectories", NULL, NULL);
 
     if (window == NULL) {
         std::cout << "Failed To Create Window" << std::endl;
         glfwTerminate();
         return -1;
     }
+    
     glfwMakeContextCurrent(window);
-
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -28,15 +31,16 @@ int main() {
         return -1;
     }
 
+    Map map;
 
+    // render loop
     while (!glfwWindowShouldClose(window))
     {
-        glm::vec3 vector(1.0f);
-        glViewport(0, 0, 800, 600);
+        map.Draw();
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     glfwTerminate();
     return 0;

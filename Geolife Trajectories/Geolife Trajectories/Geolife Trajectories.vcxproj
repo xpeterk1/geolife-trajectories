@@ -142,7 +142,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libs\glad\glad.c" />
-    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="model\Map.cpp" />
+    <ClCompile Include="opengl\Shader.cpp" />
+    <ClCompile Include="model\Trajectory.cpp" />
+    <ClCompile Include="utils\TrajectoryLoader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="model\Map.h" />
+    <ClInclude Include="opengl\Shader.h" />
+    <ClInclude Include="model\Trajectory.h" />
+    <ClInclude Include="utils\TrajectoryLoader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\map.frag" />
+    <None Include="shaders\map.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
