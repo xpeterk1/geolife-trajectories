@@ -1,16 +1,25 @@
+#pragma once
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 #include <iostream>
-#include "opengl/Shader.h"
-#include "model/Map.h"
+#include "opengl/Map.h"
+#include "model/Dataset.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
-//#undef main
+std::unique_ptr<Map> map_ptr;
+std::unique_ptr<Dataset> data_ptr;
+const float zoom_sensitivity = 0.05f;
+const float move_sensitivity = 0.02f;
+
 int main() {
-    glfwInit();
+    
+glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -25,18 +34,24 @@ int main() {
     
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
 
-    Map map;
+    map_ptr = std::make_unique<Map>();
+    data_ptr = std::make_unique<Dataset>("data", 1000);
 
     // render loop
     while (!glfwWindowShouldClose(window))
     {
-        map.Draw();
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        map_ptr->Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -46,6 +61,17 @@ int main() {
     return 0;
 }
 
+//CALLBACKS
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow* window, double x, double y)
+{
+    
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    
 }

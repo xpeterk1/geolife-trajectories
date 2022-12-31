@@ -143,15 +143,20 @@
   <ItemGroup>
     <ClCompile Include="libs\glad\glad.c" />
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="model\Map.cpp" />
+    <ClCompile Include="model\Dataset.cpp" />
+    <ClCompile Include="opengl\Map.cpp" />
     <ClCompile Include="opengl\Shader.cpp" />
     <ClCompile Include="model\Trajectory.cpp" />
+    <ClCompile Include="utils\TextureLoader.cpp" />
     <ClCompile Include="utils\TrajectoryLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="model\Map.h" />
+    <ClInclude Include="model\Dataset.h" />
+    <ClInclude Include="libs\stb_image.h" />
+    <ClInclude Include="opengl\Map.h" />
     <ClInclude Include="opengl\Shader.h" />
     <ClInclude Include="model\Trajectory.h" />
+    <ClInclude Include="utils\TextureLoader.h" />
     <ClInclude Include="utils\TrajectoryLoader.h" />
   </ItemGroup>
   <ItemGroup>

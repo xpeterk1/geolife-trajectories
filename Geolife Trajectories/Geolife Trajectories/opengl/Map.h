@@ -3,14 +3,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include "../opengl/Shader.h"
+#include "Shader.h"
+#include "../utils/TextureLoader.h"
 
 class Map
 {
 private:
-	GLuint vao, vbo;
+	GLuint vao, vbo, texture_id;
 	Shader map_shader;
+	float scale_factor = 1;
+	glm::vec2 translation;
 
 	const glm::vec3 square[4]
 	{
@@ -24,11 +28,13 @@ public:
 	
 
 private:
-
+	void Transform();
 
 public:
 	Map();
 	~Map();
+	void AddScale(float scale_factor);
+	void Translate(glm::vec2 direction);
 	void Draw();
 
 };

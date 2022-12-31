@@ -30,7 +30,13 @@
     <ClCompile Include="utils\TrajectoryLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="model\Map.cpp">
+    <ClCompile Include="opengl\Map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\TextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Dataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,7 +50,16 @@
     <ClInclude Include="utils\TrajectoryLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="model\Map.h">
+    <ClInclude Include="opengl\Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\TextureLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Dataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
