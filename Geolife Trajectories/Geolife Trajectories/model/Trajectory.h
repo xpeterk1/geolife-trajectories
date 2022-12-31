@@ -14,9 +14,9 @@ class Trajectory
 {
 
 private:
-	std::vector<glm::vec2> positions;
 
 public:
+	std::vector<glm::vec2> positions;
 	int size;
 	TransportationMode mode;
 

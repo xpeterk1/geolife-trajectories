@@ -26,6 +26,8 @@ public:
 
 private:
 	Trajectory ProcessTrajectory(std::filesystem::path path, bool normalize);
+	std::vector<Trajectory> LoadFromTxt(std::string data_folder_path, int count, bool normalize);
+	std::vector<Trajectory> LoadFromFolder(std::string data_folder_path, int count, bool normalize);
 
 public:
 	std::vector<Trajectory> Load(std::string data_folder_path, bool normalize);

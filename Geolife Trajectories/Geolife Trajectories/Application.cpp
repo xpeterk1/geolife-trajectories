@@ -8,6 +8,8 @@
 #include "opengl/Map.h"
 #include "model/Dataset.h"
 
+#include "glm/gtx/string_cast.hpp"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
@@ -43,7 +45,7 @@ glfwInit();
     }
 
     map_ptr = std::make_unique<Map>();
-    data_ptr = std::make_unique<Dataset>("data", 1000, true);
+    data_ptr = std::make_unique<Dataset>("data/data.txt",10000, false);
 
     // render loop
     while (!glfwWindowShouldClose(window))
