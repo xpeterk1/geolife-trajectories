@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 
 #include "../model/Dataset.h"
 
@@ -25,11 +25,11 @@ private:
 public:
 
 private:
-	Trajectory ProcessTrajectory(std::filesystem::path path);
+	Trajectory ProcessTrajectory(std::filesystem::path path, bool normalize);
 
 public:
-	std::vector<Trajectory> Load(std::string data_folder_path);
-	std::vector<Trajectory> Load(std::string data_folder_path, int count);
+	std::vector<Trajectory> Load(std::string data_folder_path, bool normalize);
+	std::vector<Trajectory> Load(std::string data_folder_path, int count, bool normalize);
 
 };
 

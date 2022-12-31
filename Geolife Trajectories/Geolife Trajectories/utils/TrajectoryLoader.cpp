@@ -1,12 +1,12 @@
 #include "TrajectoryLoader.h"
 
-std::vector<Trajectory> TrajectoryLoader::Load(std::string data_folder_path)
+std::vector<Trajectory> TrajectoryLoader::Load(std::string data_folder_path, bool normalize)
 {
 	data_path = data_folder_path;
-	return Load(data_folder_path, -1);
+	return Load(data_folder_path, -1, normalize);
 }
 
-std::vector<Trajectory> TrajectoryLoader::Load(std::string data_folder_path, int count)
+std::vector<Trajectory> TrajectoryLoader::Load(std::string data_folder_path, int count, bool normalize)
 {
 	data_path = data_folder_path;
 	std::vector<Trajectory> output;
@@ -21,7 +21,7 @@ std::vector<Trajectory> TrajectoryLoader::Load(std::string data_folder_path, int
 
 		if (dirEntry.path().extension() == ".txt" || dirEntry.path().extension() == ".pdf") continue;
 
-		Trajectory traj = ProcessTrajectory(dirEntry.path());
+		Trajectory traj = ProcessTrajectory(dirEntry.path(), normalize);
 		if (traj.size > 0)
 			output.push_back(traj);
 		
@@ -31,7 +31,7 @@ std::vector<Trajectory> TrajectoryLoader::Load(std::string data_folder_path, int
 	return output;
 }
 
-Trajectory TrajectoryLoader::ProcessTrajectory(std::filesystem::path path)
+Trajectory TrajectoryLoader::ProcessTrajectory(std::filesystem::path path, bool normalize)
 {
 	std::ifstream file(path);
 
@@ -67,6 +67,12 @@ Trajectory TrajectoryLoader::ProcessTrajectory(std::filesystem::path path)
 
 		// point falls outside of the examined map piece
 		if (latitude < LATITUDE_MIN || longitude < LONGITUDE_MIN || latitude > LATITUDE_MAX || longitude > LONGITUDE_MAX) continue;
+
+		if (normalize)
+		{
+			latitude = (latitude - LATITUDE_MIN) / (LATITUDE_MAX - LATITUDE_MIN);
+			longitude = (longitude - LONGITUDE_MIN) / (LONGITUDE_MAX - LONGITUDE_MIN);
+		}
 
 		points.push_back(glm::vec2(latitude, longitude));
 	}

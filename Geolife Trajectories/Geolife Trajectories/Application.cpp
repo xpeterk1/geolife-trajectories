@@ -43,7 +43,7 @@ glfwInit();
     }
 
     map_ptr = std::make_unique<Map>();
-    data_ptr = std::make_unique<Dataset>("data", 1000);
+    data_ptr = std::make_unique<Dataset>("data", 1000, true);
 
     // render loop
     while (!glfwWindowShouldClose(window))

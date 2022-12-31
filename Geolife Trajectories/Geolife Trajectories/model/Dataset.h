@@ -19,7 +19,7 @@ public:
 private:
 
 public:
-	Dataset(std::string path);
-	Dataset(std::string path, int max_count);
+	Dataset(std::string path, bool normalize);
+	Dataset(std::string path, int max_count, bool normalize);
 
 };
