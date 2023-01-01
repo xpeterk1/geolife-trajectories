@@ -149,6 +149,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cuda\Predict.cpp" />
     <ClCompile Include="libs\glad\glad.c" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="model\Dataset.cpp" />
