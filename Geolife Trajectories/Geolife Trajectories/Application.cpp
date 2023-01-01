@@ -19,61 +19,65 @@ std::unique_ptr<Dataset> data_ptr;
 const float zoom_sensitivity = 0.05f;
 const float move_sensitivity = 0.02f;
 
+#include "cuda/File.h"
+
 int main() {
-    
-glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 800, "Geolife Trajectories", NULL, NULL);
+	ahoj();
 
-    if (window == NULL) {
-        std::cout << "Failed To Create Window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+	GLFWwindow* window = glfwCreateWindow(800, 800, "Geolife Trajectories", NULL, NULL);
 
-    map_ptr = std::make_unique<Map>();
-    data_ptr = std::make_unique<Dataset>("data/data.txt",10000, false);
+	if (window == NULL) {
+		std::cout << "Failed To Create Window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
 
-    // render loop
-    while (!glfwWindowShouldClose(window))
-    {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        map_ptr->Draw();
+	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
-    glfwTerminate();
-    return 0;
+	map_ptr = std::make_unique<Map>();
+	data_ptr = std::make_unique<Dataset>("data/data.txt", 10000, true);
+
+	// render loop
+	while (!glfwWindowShouldClose(window))
+	{
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		map_ptr->Draw();
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
+	return 0;
 }
 
 //CALLBACKS
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);
 }
 
 void mouse_callback(GLFWwindow* window, double x, double y)
 {
-    
+
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    
+
 }

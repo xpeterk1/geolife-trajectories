@@ -62,9 +62,15 @@
     <ClInclude Include="model\Dataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cuda\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\map.vert" />
     <None Include="shaders\map.frag" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="cuda\File.cu" />
   </ItemGroup>
 </Project>
