@@ -159,7 +159,7 @@
     <ClCompile Include="utils\TrajectoryLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cuda\File.h" />
+    <ClInclude Include="cuda\Predict.h" />
     <ClInclude Include="model\Dataset.h" />
     <ClInclude Include="libs\stb_image.h" />
     <ClInclude Include="opengl\Map.h" />
@@ -173,7 +173,7 @@
     <None Include="shaders\map.vert" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="cuda\File.cu" />
+    <CudaCompile Include="cuda\Predict.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

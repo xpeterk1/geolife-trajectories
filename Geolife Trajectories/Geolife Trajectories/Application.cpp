@@ -10,6 +10,8 @@
 
 #include "glm/gtx/string_cast.hpp"
 
+#include "cuda/Predict.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
@@ -19,11 +21,7 @@ std::unique_ptr<Dataset> data_ptr;
 const float zoom_sensitivity = 0.05f;
 const float move_sensitivity = 0.02f;
 
-#include "cuda/File.h"
-
 int main() {
-
-	ahoj();
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -50,6 +48,9 @@ int main() {
 
 	map_ptr = std::make_unique<Map>();
 	data_ptr = std::make_unique<Dataset>("data/data.txt", 10000, true);
+
+	//Compute points of interest
+	compute_pois(data_ptr.get()->data);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
