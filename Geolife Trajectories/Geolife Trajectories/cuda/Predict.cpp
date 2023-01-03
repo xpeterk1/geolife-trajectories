@@ -12,17 +12,18 @@ std::vector<float> get_gaussian_kernel(float sigma, int kernel_size)
 	{
 		for (int x = -kernel_size / 2; x <= kernel_size / 2; x++)
 		{
-			float val = 1 / (2 * PI * pow(sigma, 2)) * exp(-((pow(x, 2) + pow(y, 2))/(2 * pow(sigma, 2))));
+			float normal = 1 / (2.0f * PI * pow(sigma, 2));
+			float val = exp(-(pow(x, 2) + pow(y, 2)) / (2.0f * pow(sigma, 2))) * normal;
 			kernel[(y + kernel_size / 2) * kernel_size + (x + kernel_size / 2)] = val;
 			sum += val;
 		}
 	}
 
 	// Normalize the kernel
-	//for (int i = 0; i < pow(kernel_size, 2); i++)
-	//{
-	//	kernel[i] /= sum;
-	//}
+	for (int i = 0; i < pow(kernel_size, 2); i++)
+	{
+		kernel[i] /= sum;
+	}
 
 	return kernel;
 }
