@@ -29,7 +29,9 @@ Map::~Map()
 void Map::Draw()
 {
     map_shader.use();
+    map_shader.setInt("map_texture", 0);
     glBindVertexArray(vao);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

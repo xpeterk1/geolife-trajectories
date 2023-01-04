@@ -7,6 +7,6 @@ uniform mat4 modelMatrix;
 
 
 void main(){
-	FragCoord = (modelMatrix * vec4(aPos, 1.0)).xy;
+	FragCoord = (aPos * 0.5 + 0.5).xy;
 	gl_Position = modelMatrix * vec4(aPos, 1.0);
 };
