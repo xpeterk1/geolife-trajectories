@@ -118,22 +118,24 @@ std::vector<Datapoint> TrajectoryLoader::LoadFromTxt(std::string data_txt_path, 
 		if (line.empty()) break;
 
 		size_t pos = 0;
-		std::string token;
+		std::string token[4];
 
-		pos = line.find(", ");
-		token = line.substr(0, pos);
-		std::replace(token.begin(), token.end(), ',', '.');
-		float latitude = std::stof(token);
-		line.erase(0, pos + 2);
+		for (int i = 0; i < 4; i++)
+		{
+			pos = line.find(" ");
+			token[i] = line.substr(0, pos);
+			line.erase(0, pos + 1);
+		}
 
-		pos = line.find(", ");
-		token = line.substr(0, pos);
-		std::replace(token.begin(), token.end(), ',', '.');
-		float longitude = std::stof(token);
-		line.erase(0, pos + 2);
+		// longite + latitude
+		float latitude = std::stof(token[0]);
+		float longitude = std::stof(token[1]);
+		time_t time = std::stoi(token[2]);
+		TransportationMode mode = TransportationMode(std::stoi(token[3]));
 
 		// point falls outside of the examined map piece
-		if (latitude < LATITUDE_MIN || longitude < LONGITUDE_MIN || latitude > LATITUDE_MAX || longitude > LONGITUDE_MAX) continue;
+		// TODO: muj dataset je uz normalizovany
+		//if (latitude < LATITUDE_MIN || longitude < LONGITUDE_MIN || latitude > LATITUDE_MAX || longitude > LONGITUDE_MAX) continue;
 
 		if (normalize)
 		{
@@ -141,7 +143,7 @@ std::vector<Datapoint> TrajectoryLoader::LoadFromTxt(std::string data_txt_path, 
 			longitude = (longitude - LONGITUDE_MIN) / (LONGITUDE_MAX - LONGITUDE_MIN);
 		}
 
-		output.push_back(Datapoint(latitude, longitude, UNKNOWN, time_t(-1)));
+		output.push_back(Datapoint(latitude, longitude, mode, time));
 		counter++;
 	}
 
