@@ -24,9 +24,6 @@
     <ClCompile Include="opengl\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="model\Trajectory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="utils\TrajectoryLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,15 +36,15 @@
     <ClCompile Include="model\Dataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cuda\Predict.cpp">
+    <ClCompile Include="cuda\heatmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model\Datapoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="opengl\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="model\Trajectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utils\TrajectoryLoader.h">
@@ -65,7 +62,10 @@
     <ClInclude Include="model\Dataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cuda\Predict.h">
+    <ClInclude Include="cuda\heatmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\Datapoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,6 +74,6 @@
     <None Include="shaders\map.frag" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="cuda\Predict.cu" />
+    <CudaCompile Include="cuda\heatmap.cu" />
   </ItemGroup>
 </Project>

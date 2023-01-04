@@ -149,23 +149,23 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cuda\Predict.cpp" />
+    <ClCompile Include="cuda\heatmap.cpp" />
+    <ClCompile Include="model\Datapoint.cpp" />
     <ClCompile Include="libs\glad\glad.c" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="model\Dataset.cpp" />
     <ClCompile Include="opengl\Map.cpp" />
     <ClCompile Include="opengl\Shader.cpp" />
-    <ClCompile Include="model\Trajectory.cpp" />
     <ClCompile Include="utils\TextureLoader.cpp" />
     <ClCompile Include="utils\TrajectoryLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cuda\Predict.h" />
+    <ClInclude Include="cuda\heatmap.h" />
+    <ClInclude Include="model\Datapoint.h" />
     <ClInclude Include="model\Dataset.h" />
     <ClInclude Include="libs\stb_image.h" />
     <ClInclude Include="opengl\Map.h" />
     <ClInclude Include="opengl\Shader.h" />
-    <ClInclude Include="model\Trajectory.h" />
     <ClInclude Include="utils\TextureLoader.h" />
     <ClInclude Include="utils\TrajectoryLoader.h" />
   </ItemGroup>
@@ -174,7 +174,7 @@
     <None Include="shaders\map.vert" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="cuda\Predict.cu" />
+    <CudaCompile Include="cuda\heatmap.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

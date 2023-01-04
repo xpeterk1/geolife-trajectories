@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Trajectory.h"
+#include "Datapoint.h"
 #include "../utils/TrajectoryLoader.h"
 
 #include <vector>
@@ -13,7 +13,7 @@ private:
 
 public:
 	std::string path;
-	std::vector<Trajectory> data;
+	std::vector<Datapoint> data;
 	int size;
 
 private:

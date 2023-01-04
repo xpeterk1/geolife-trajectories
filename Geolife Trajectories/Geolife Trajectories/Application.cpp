@@ -10,7 +10,7 @@
 
 #include "glm/gtx/string_cast.hpp"
 
-#include "cuda/Predict.h"
+#include "cuda/heatmap.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -47,10 +47,10 @@ int main() {
 	}
 
 	map_ptr = std::make_unique<Map>();
-	data_ptr = std::make_unique<Dataset>("data/data.txt", 10000, true);
+	data_ptr = std::make_unique<Dataset>("data", 1000, true);
 
-	//Compute points of interest
-	compute_pois(data_ptr.get()->data);
+	// Compute points of interest
+	compute_heatmap(data_ptr.get()->data);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))

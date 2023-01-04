@@ -1,12 +1,15 @@
  #pragma once
 
 #include "../model/Dataset.h"
+#include "../model/Datapoint.h"
 
-#include <string>
 #include <vector>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <cstring>
+#include <string>
+#include <chrono>
 
 
 
@@ -25,13 +28,13 @@ private:
 public:
 
 private:
-	Trajectory ProcessTrajectory(std::filesystem::path path, bool normalize);
-	std::vector<Trajectory> LoadFromTxt(std::string data_folder_path, int count, bool normalize);
-	std::vector<Trajectory> LoadFromFolder(std::string data_folder_path, int count, bool normalize);
+	std::vector<Datapoint> ProcessTrajectory(std::filesystem::path path, bool normalize);
+	std::vector<Datapoint> LoadFromTxt(std::string data_folder_path, int count, bool normalize);
+	std::vector<Datapoint> LoadFromFolder(std::string data_folder_path, int count, bool normalize);
 
 public:
-	std::vector<Trajectory> Load(std::string data_folder_path, bool normalize);
-	std::vector<Trajectory> Load(std::string data_folder_path, int count, bool normalize);
+	std::vector<Datapoint> Load(std::string data_folder_path, bool normalize);
+	std::vector<Datapoint> Load(std::string data_folder_path, int count, bool normalize);
 
 };
 

@@ -1,4 +1,4 @@
-#include "Predict.h"
+#include "heatmap.h"
 
 #define __CUDACC__
 #define __CUDA_ARCH__ 860
@@ -11,6 +11,7 @@
 #include "cuda_runtime.h"
 #include "device_atomic_functions.h"
 #include "device_launch_parameters.h"
+#include <fstream>
 
 /// <summary>
 /// Perform Kernel Density Estimation using Gaussian Kernel
@@ -54,7 +55,7 @@ __global__ void kde_kernel(glm::vec2* points, int n_point, float* kernel, int ke
 	__threadfence();
 }
 
-std::vector<glm::vec2> compute_pois(std::vector<Trajectory> points)
+std::vector<glm::vec2> compute_heatmap(std::vector<Datapoint> points)
 {
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop, 0);
@@ -64,7 +65,7 @@ std::vector<glm::vec2> compute_pois(std::vector<Trajectory> points)
 	float* kernel_buffer = 0;
 	float* output_buffer = 0;
 
-	int n = points[0].positions.size();
+	int n = points.size();
 	int output_size = pow(pow(10, PRECISION), 2);
 
 	int size_bytes = n * sizeof(glm::vec2);
@@ -73,7 +74,7 @@ std::vector<glm::vec2> compute_pois(std::vector<Trajectory> points)
 	auto gauss_kernel = get_gaussian_kernel( SIGMA, KERNEL_SIZE);
 
 	cudaMalloc((void**)&input_buffer, size_bytes);
-	cudaMemcpy(input_buffer, & points[0].positions[0], size_bytes, cudaMemcpyHostToDevice);
+	cudaMemcpy(input_buffer, & points[0], size_bytes, cudaMemcpyHostToDevice);
 
 	cudaMalloc((void**)&kernel_buffer, kernel_size_bytes);
 	cudaMemcpy(kernel_buffer, &gauss_kernel[0], kernel_size_bytes, cudaMemcpyHostToDevice);
@@ -82,7 +83,6 @@ std::vector<glm::vec2> compute_pois(std::vector<Trajectory> points)
 	int output_size_bytes = output_size * sizeof(float);
 	cudaMalloc((void**)&output_buffer, output_size_bytes);
 
-	//TODO: spravny pocet vlaken
 	int blocks = (floor(n) / BLOCKSIZE) + 1;
 	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, KERNEL_SIZE, output_buffer, PRECISION);
 
