@@ -434,3 +434,6 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,c++
+Geolife Trajectories/Geolife Trajectories/data/data_small.txt
+Geolife Trajectories/Geolife Trajectories/data/data.bin
+Geolife Trajectories/Geolife Trajectories/data/data.txt
