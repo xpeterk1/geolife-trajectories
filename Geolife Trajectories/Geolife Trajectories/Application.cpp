@@ -47,10 +47,35 @@ int main() {
 	}
 
 	map_ptr = std::make_unique<Map>();
-	data_ptr = std::make_unique<Dataset>("data/data.txt",1000000, false);
+	data_ptr = std::make_unique<Dataset>("data/data_small.txt",100000, false);
+
+	//std::ofstream file("data_small.txt");
+	//for (const auto& point : data_ptr->data) 
+	//{
+	//	file << point.x << " " << point.y << " " << point.time << " " << point.mode << std::endl;
+	//}
+
+	//file.flush();
+	//file.close();
 
 	// Compute points of interest
-	compute_heatmap(data_ptr.get()->data);
+	std::vector<float> heatmap = compute_heatmap(data_ptr.get()->data);
+
+	int c = 0;
+	for (float f : heatmap)
+	{
+		if (f != 0) c++;
+	}
+
+	int dim = pow(10, 4);
+	unsigned int heatmap_texture;
+	glGenTextures(1, &heatmap_texture);
+	glBindTexture(GL_TEXTURE_2D, heatmap_texture);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, dim, dim);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim, dim, GL_RED, GL_FLOAT, &heatmap[0]);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// render loop
 	while (!glfwWindowShouldClose(window))

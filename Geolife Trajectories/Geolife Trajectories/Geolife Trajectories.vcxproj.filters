@@ -82,4 +82,9 @@
   <ItemGroup>
     <CudaCompile Include="cuda\heatmap.cu" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\map.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

@@ -9,5 +9,5 @@
 class TextureLoader {
 
 public:
-	unsigned int LoadTextureFromFile(char const* path, const unsigned int& textureUnit = 0, GLint wrappingMethod = GL_CLAMP_TO_EDGE, bool gammaCorrection = false);
+	unsigned int LoadTextureFromFile(char const* path);
 };

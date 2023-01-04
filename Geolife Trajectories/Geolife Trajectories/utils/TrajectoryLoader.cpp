@@ -13,6 +13,8 @@ std::vector<Datapoint> TrajectoryLoader::Load(std::string data_source_path, int 
 
 	if (entry.is_directory())
 		return LoadFromFolder(data_source_path, count, normalize);
+	else if (entry.path().extension() == ".bin")
+		return LoadFromBinary(data_source_path, count);
 	else
 		return LoadFromTxt(data_source_path, count, normalize);
 }
@@ -69,18 +71,18 @@ std::vector<Datapoint> TrajectoryLoader::ProcessTrajectory(std::filesystem::path
 
 		// Transportation mode
 		TransportationMode mode = UNKNOWN;
-		if (!labels.Empty()) 
+		if (!labels.Empty())
 		{
 			// read date and time
 			struct std::tm tm_start = { 0 };
 			std::istringstream ss_start(token[5]);
 			ss_start >> std::get_time(&tm_start, "%Y-%m-%d"); // or just %T in this case
 			int date = tm_start.tm_year * 10000 + tm_start.tm_mon * 100 + tm_start.tm_mday;
-		
-			if (labels.labels.contains(date)) 
+
+			if (labels.labels.contains(date))
 			{
 				std::vector<Label> l = labels.labels.at(date);
-				
+
 				for (Label lab : l)
 				{
 					if (lab.start_seconds <= seconds && lab.end_seconds >= seconds)
@@ -192,6 +194,26 @@ std::vector<Datapoint> TrajectoryLoader::LoadFromFolder(std::string data_folder_
 	return output;
 }
 
+std::vector<Datapoint> TrajectoryLoader::LoadFromBinary(std::string data_folder_path, int count)
+{
+	std::ifstream in(data_folder_path, std::ios::binary);
+
+	// Read the data from the file
+	std::vector<Datapoint> points;
+	Datapoint p;
+	int counter = 0;
+	while (in >> p) {
+		if (counter == count) break;
+		points.push_back(p);
+		counter++;
+	}
+
+	// Close the file
+	in.close();
+
+	return points;
+}
+
 Labels TrajectoryLoader::ReadLabels(std::string labels_location)
 {
 	std::ifstream file(labels_location);
@@ -231,7 +253,7 @@ Labels TrajectoryLoader::ReadLabels(std::string labels_location)
 		int end_date = tm_end.tm_year * 10000 + tm_end.tm_mon * 100 + tm_end.tm_mday;
 		int end_seconds = tm_end.tm_sec + tm_end.tm_min * 60 + tm_end.tm_hour * 3600;
 
-		if (!transportation_modes_table.contains(token[2])) 
+		if (!transportation_modes_table.contains(token[2]))
 		{
 			//TODO: new transportation mode
 			int br = 3;
@@ -244,7 +266,8 @@ Labels TrajectoryLoader::ReadLabels(std::string labels_location)
 		{
 			labels.Add(start_date, start_seconds, 86400, mode);
 			labels.Add(end_date, 0, end_seconds, mode);
-		} else
+		}
+		else
 		{
 			labels.Add(start_date, start_seconds, end_seconds, mode);
 		}

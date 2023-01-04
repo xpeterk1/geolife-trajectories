@@ -178,6 +178,9 @@
   <ItemGroup>
     <CudaCompile Include="cuda\heatmap.cu" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\map.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.7.targets" />

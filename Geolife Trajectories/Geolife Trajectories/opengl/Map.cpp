@@ -17,7 +17,7 @@ Map::Map() : map_shader("shaders\\map.vert", "shaders\\map.frag")
     translation = glm::vec2(0.0f);
     Transform();
 
-    int textureID = TextureLoader().LoadTextureFromFile("resources\\tex.png");
+    texture_id = TextureLoader().LoadTextureFromFile("resources\\map.png");
 }
 
 Map::~Map()
@@ -30,8 +30,10 @@ void Map::Draw()
 {
     map_shader.use();
     glBindVertexArray(vao);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Map::AddScale(float scale_factor) 

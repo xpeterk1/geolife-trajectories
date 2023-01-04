@@ -4,7 +4,7 @@
 #define __CUDA_ARCH__ 860
 #define BLOCKSIZE 256
 
-#define PRECISION 3
+#define PRECISION 4
 #define KERNEL_SIZE 9
 #define SIGMA 1.0f
 
@@ -55,7 +55,15 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 	__threadfence();
 }
 
-void compute_heatmap(std::vector<Datapoint> points)
+__global__ void normalize_kernel(float* data, int data_size, int N)
+{
+	int global_id = threadIdx.x + blockDim.x * blockIdx.x;
+	if (global_id > data_size) return;
+
+	data[global_id] /= float(N);
+}
+
+std::vector<float> compute_heatmap(std::vector<Datapoint> points)
 {
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop, 0);
@@ -85,20 +93,17 @@ void compute_heatmap(std::vector<Datapoint> points)
 
 	int blocks = (floor(n) / BLOCKSIZE) + 1;
 	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, KERNEL_SIZE, output_buffer, PRECISION);
+	//normalize_kernel << <blocks, BLOCKSIZE >> > (output_buffer, n, points.size());
 
 	// copy results to CPU side
 	std::vector<float> results;
 	results.resize(output_size);
 	cudaMemcpy(&results[0], output_buffer, output_size_bytes, cudaMemcpyDeviceToHost);
 
-	std::ofstream file("out.txt");
-
-	for (float f : results)
-		file << f << " ";
-	file.close();
-
 	// free up used resources
 	cudaFree(input_buffer);
 	cudaFree(kernel_buffer);
 	cudaFree(output_buffer);
+
+	return results;
 }
