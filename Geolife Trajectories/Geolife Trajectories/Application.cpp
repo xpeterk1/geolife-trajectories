@@ -47,7 +47,7 @@ int main() {
 	}
 
 	map_ptr = std::make_unique<Map>();
-	data_ptr = std::make_unique<Dataset>("data/data_small.txt",100000, false);
+	data_ptr = std::make_unique<Dataset>("data/data_small.txt",1000000, false);
 
 	//std::ofstream file("data_small.txt");
 	//for (const auto& point : data_ptr->data) 
@@ -83,7 +83,7 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		map_ptr->Draw();
+		map_ptr->Draw(heatmap_texture);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

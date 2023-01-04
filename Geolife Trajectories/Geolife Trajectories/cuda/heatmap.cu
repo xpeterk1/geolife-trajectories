@@ -32,8 +32,9 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 	if (global_id > n_point) return;
 
 	// find corresponding (x, y) coordinates in the output_data
-	int x = (int)(points[global_id].x * output_size) + 1;
-	int y = (int)(points[global_id].y * output_size) + 1;
+	// AND SWITCH X AND Y
+	int x = (int)(points[global_id].y * output_size) + 1;
+	int y = (int)(points[global_id].x * output_size) + 1;
 	
 	// perform addition around (x, y)
 	int kernel_index = 0;

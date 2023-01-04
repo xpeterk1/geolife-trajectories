@@ -26,15 +26,24 @@ Map::~Map()
 	glDeleteBuffers(1, &vbo);
 }
 
-void Map::Draw()
+void Map::Draw(unsigned int heatmap_texture_id)
 {
     map_shader.use();
     map_shader.setInt("map_texture", 0);
+    map_shader.setInt("heatmap_texture", 1);
+    
     glBindVertexArray(vao);
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_id);
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, heatmap_texture_id);
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
