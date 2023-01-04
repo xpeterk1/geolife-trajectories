@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cuda\heatmap.cpp" />
+    <ClCompile Include="model\Labels.cpp" />
     <ClCompile Include="model\Datapoint.cpp" />
     <ClCompile Include="libs\glad\glad.c" />
     <ClCompile Include="Application.cpp" />
@@ -161,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cuda\heatmap.h" />
+    <ClInclude Include="model\Labels.h" />
     <ClInclude Include="model\Datapoint.h" />
     <ClInclude Include="model\Dataset.h" />
     <ClInclude Include="libs\stb_image.h" />

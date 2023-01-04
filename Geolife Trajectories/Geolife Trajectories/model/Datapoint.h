@@ -3,7 +3,7 @@
 
 enum TransportationMode : int
 {
-	UNKNOWN, WALK, BIKE, BUS, CAR, TRAIN, AIRPLANE, OTHER
+	UNKNOWN, WALK, BIKE, BUS, CAR, SUBWAY, TRAIN, AIRPLANE, BOAT, RUN, MOTORCYCLE
 };
 
 class Datapoint

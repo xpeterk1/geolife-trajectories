@@ -47,7 +47,16 @@ int main() {
 	}
 
 	map_ptr = std::make_unique<Map>();
-	data_ptr = std::make_unique<Dataset>("data", 1000, true);
+	data_ptr = std::make_unique<Dataset>("data", true);
+
+	std::ofstream file("data.txt");
+	for (const auto& point : data_ptr->data) 
+	{
+		file << point.x << " " << point.y << " " << point.time << " " << point.mode << std::endl;
+	}
+
+	file.flush();
+	file.close();
 
 	// Compute points of interest
 	compute_heatmap(data_ptr.get()->data);
