@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "opengl/Map.h"
+#include "model/HeatmapConfig.h"
 #include "model/Dataset.h"
 #include "cuda/heatmap.h"
 
@@ -22,11 +23,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void DrawGUI();
 
 std::unique_ptr<Map> map_ptr;
 std::unique_ptr<Dataset> data_ptr;
 const float zoom_sensitivity = 0.1f;
 const float move_sensitivity = 0.05f;
+
+HeatmapConfig heatmap_config;
 
 int main() {
 
@@ -57,16 +61,16 @@ int main() {
 
 	map_ptr = std::make_unique<Map>();
 	data_ptr = std::make_unique<Dataset>("data/data.bin", true);
-
+	
 	//FILE* fp;
 	//fopen_s(&fp, "data.bin", "wb");
 	//size_t items_written = fwrite(data_ptr->data.data(), sizeof(Datapoint), data_ptr->size, fp);
 	//fclose(fp);
-	
-	// Compute points of interest
-	std::vector<float> heatmap = compute_heatmap(data_ptr.get()->data);
 
-	//TODO: heatmap texture init
+	// Initialize and upload data to cuda
+	init_heatmap_data(data_ptr.get()->data);
+
+	// Prepare output texture for heatmap
 	int dim = pow(10, 4);
 	unsigned int heatmap_texture;
 	glGenTextures(1, &heatmap_texture);
@@ -74,10 +78,9 @@ int main() {
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, dim, dim);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim, dim, GL_RED, GL_FLOAT, &heatmap[0]);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//TODO: imgui init
+	//Init ImGUI
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -91,20 +94,29 @@ int main() {
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//TODO: test imgui
+		//New ImGUI Frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
+		// Draw GUI
+		DrawGUI();
 
+		// Some GUI element changed
+		int newMode = 0;
+		if (heatmap_config.NeedsRecomputation(&newMode))
+		{
+			std::vector<float> heatmap = compute_heatmap(newMode);
 
+			glBindTexture(GL_TEXTURE_2D, heatmap_texture);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim, dim, GL_RED, GL_FLOAT, &heatmap[0]);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		// Draw map with heatmap
 		map_ptr->Draw(heatmap_texture);
 
-		//TODO: test imgui II
-		ImGui::Begin("My name is window, ImGUI window");
-		ImGui::Text("EY YOOOOOO SHEEESH");
-		ImGui::End();
-
+		// Render GUI
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -116,6 +128,9 @@ int main() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	//Free cuda related buffers
+	free_heatmap_data();
 
 	glfwTerminate();
 	return 0;
@@ -151,4 +166,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		map_ptr->Translate(glm::vec2(0, -move_sensitivity));
 	if (key == GLFW_KEY_DOWN)
 		map_ptr->Translate(glm::vec2(0, move_sensitivity));
+}
+
+void DrawGUI() 
+{
+	ImGui::Begin("Main Menu");
+
+	// Checkboxes for transportation modes
+	ImGui::Text("Transportation mode");
+	ImGui::Checkbox("Walk", &heatmap_config.walk);
+	ImGui::Checkbox("Bike", &heatmap_config.bike);
+	ImGui::Checkbox("Bus", &heatmap_config.bus);
+	ImGui::Checkbox("Car", &heatmap_config.car);
+	ImGui::Checkbox("Subway", &heatmap_config.subway);
+	ImGui::Checkbox("Train", &heatmap_config.train);
+	ImGui::Checkbox("Airplane", &heatmap_config.airplane);
+	ImGui::Checkbox("Boat", &heatmap_config.boat);
+	ImGui::Checkbox("Run", &heatmap_config.run);
+	ImGui::Checkbox("Motorcycle", &heatmap_config.motorcycle);
+
+	ImGui::End();
 }
