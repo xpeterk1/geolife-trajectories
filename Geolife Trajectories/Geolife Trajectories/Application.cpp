@@ -158,6 +158,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (action != GLFW_PRESS) return;
+
 	if (key == GLFW_KEY_LEFT)
 		map_ptr->Translate(glm::vec2(move_sensitivity,0));
 	if (key == GLFW_KEY_RIGHT)
@@ -184,6 +186,9 @@ void DrawGUI()
 	ImGui::Checkbox("Boat", &heatmap_config.boat);
 	ImGui::Checkbox("Run", &heatmap_config.run);
 	ImGui::Checkbox("Motorcycle", &heatmap_config.motorcycle);
+
+	if (ImGui::Button("Reset Map"))
+		map_ptr->Reset();
 
 	ImGui::End();
 }

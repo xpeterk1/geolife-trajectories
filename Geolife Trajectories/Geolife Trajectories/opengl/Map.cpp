@@ -50,6 +50,9 @@ void Map::Draw(unsigned int heatmap_texture_id)
 void Map::AddScale(float scale_factor) 
 {
     this->scale_factor += scale_factor;
+
+    if (this->scale_factor < 1) this->scale_factor = 1;
+
     Transform();
 }
 
@@ -64,4 +67,11 @@ void Map::Transform()
     map_shader.use();
     glm::mat4 modelMat = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(this->translation, 0.0f)), glm::vec3(scale_factor));
     map_shader.setMat4F("modelMatrix", modelMat);
+}
+
+void Map::Reset() 
+{
+    scale_factor = 1;
+    translation = glm::vec2(0.0f);
+    Transform();
 }

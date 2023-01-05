@@ -36,6 +36,7 @@ public:
 	void AddScale(float scale_factor);
 	void Translate(glm::vec2 direction);
 	void Draw(unsigned int heatmap_texture);
+	void Reset();
 
 };
 
