@@ -16,20 +16,30 @@
 Datapoint* input_buffer = 0;
 float* kernel_buffer = 0;
 float* output_buffer = 0;
+float* max_buffer = 0;
 int n;
 
-/// <summary>
-/// Perform Kernel Density Estimation using Gaussian Kernel
-/// WARNING - output data are NOT normalized to have an integral of 1 -> it's not a true density function
-/// </summary>
-/// <param name="points">All input points</param>
-/// <param name="n_point">Total number of points</param>
-/// <param name="kernel">Kernel in 1D array</param>
-/// <param name="kernel_size">Size of kernel (one side)</param>
-/// <param name="output_data">Output data 2D matrix of size (10^precision)^2</param>
-/// <param name="precision">Precision of output data</param>
-/// /// <param name="mode_mask">Bit mask for transportation mode</param>
-/// <returns></returns>
+#pragma region Reduction Funtions
+
+__device__ static inline float sum_function(float& x, float& y)
+{
+	return x + y;
+}
+
+__device__ static inline float min_function(float& x, float& y)
+{
+	return min(x, y);
+}
+
+__device__ static inline float max_function(float& x, float& y)
+{
+	return max(x, y);
+}
+
+#pragma endregion
+
+#pragma region Kernels
+
 __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int kernel_size, float* output_data, int precision, int mode_mask)
 {
 	int global_id = threadIdx.x + blockDim.x * blockIdx.x;
@@ -80,13 +90,105 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 	__threadfence();
 }
 
-__global__ void normalize_kernel(float* data, int data_size, int N)
+__global__ void reduction_kernel_warp(float* data, float* output_value, int N, reductionOperation operation)
+{
+	float(*reduction_function)(float&, float&);
+	float accumulator;
+
+	switch (operation)
+	{
+	case MIN:
+		reduction_function = min_function;
+		accumulator = FLT_MAX;
+		break;
+	case MAX:
+		reduction_function = max_function;
+		accumulator = 0;
+		break;
+	case SUM:
+		reduction_function = sum_function;
+		accumulator = 0;
+		break;
+	default:
+		accumulator = 0;
+	}
+
+	if (threadIdx.x == 0)
+	{
+		for (int i = 0; i < N; i++)
+		{
+			accumulator = reduction_function(accumulator, data[i]);
+		}
+
+		output_value[0] = accumulator;
+	}
+}
+
+__global__ void reduction_kernel_blocks(float* data, float* output, int N, int num_blocks, reductionOperation operation)
+{
+	float(*reduction_function)(float&, float&);
+
+	switch (operation)
+	{
+	case MIN:
+		reduction_function = min_function;
+		break;
+	case MAX:
+		reduction_function = max_function;
+		break;
+	case SUM:
+		reduction_function = sum_function;
+		break;
+	}
+
+	unsigned int id = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int thread_id = threadIdx.x;
+
+	//copy data to local shared memory
+	__shared__ float dataChunk[BLOCKSIZE];
+
+	if (id >= 0 && id < N)
+	{
+		dataChunk[thread_id] = data[id];
+	}
+	__syncthreads();
+
+	//compute reduction of the block
+	for (unsigned int stride = (blockDim.x / 2); stride > 32; stride /= 2) {
+		__syncthreads();
+
+		if (thread_id < stride && id + stride < N)
+		{
+			dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + stride]);
+		}
+	}
+
+	// reduction within one warp = last warp in the block
+	if (thread_id < 32) {
+		dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + 32]);
+		dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + 16]);
+		dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + 8]);
+		dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + 4]);
+		dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + 2]);
+		dataChunk[thread_id] = reduction_function(dataChunk[thread_id], dataChunk[thread_id + 1]);
+	}
+
+	// last thread of each block writes to the output
+	if (thread_id == 0) {
+		output[blockIdx.x] = dataChunk[0];
+	}
+}
+
+__global__ void normalize_kernel(float* data, int N, float max)
 {
 	int global_id = threadIdx.x + blockDim.x * blockIdx.x;
-	if (global_id > data_size) return;
 
-	data[global_id] /= float(N);
+	if (global_id > N) return;
+
+	data[global_id] = data[global_id] / max;
 }
+
+#pragma endregion
 
 void init_heatmap_data(std::vector<Datapoint> points) 
 {
@@ -111,6 +213,9 @@ void init_heatmap_data(std::vector<Datapoint> points)
 	// malloc output data float array of size (10^p)x(10^p)
 	int output_size_bytes = output_size * sizeof(float);
 	cudaMalloc((void**)&output_buffer, output_size_bytes);
+
+	int grid_size = ceil((float)n / BLOCKSIZE);
+	cudaMalloc((void**)&max_buffer, grid_size * sizeof(float));
 }
 
 void free_heatmap_data() 
@@ -119,6 +224,7 @@ void free_heatmap_data()
 	cudaFree(input_buffer);
 	cudaFree(kernel_buffer);
 	cudaFree(output_buffer);
+	cudaFree(max_buffer);
 }
 
 std::vector<float> compute_heatmap(int mode_mask)
@@ -129,8 +235,45 @@ std::vector<float> compute_heatmap(int mode_mask)
 	cudaMemset(output_buffer, 0, output_size_bytes);
 
 	int blocks = (floor(n) / BLOCKSIZE) + 1;
+
+	// perform kernel density estimation
 	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, KERNEL_SIZE, output_buffer, PRECISION, mode_mask);
-	//normalize_kernel << <blocks, BLOCKSIZE >> > (output_buffer, n, points.size());
+	cudaDeviceSynchronize();
+
+	// using parallel reduction, find maximal value in output_buffer
+	// run the kernel -> local reduction results on each grid_size th element
+	int grid_size = ceil((float)output_size / BLOCKSIZE);
+	if (n >= 64)
+	{
+		// Array is long enough to be processed in blocks
+		reduction_kernel_blocks << <grid_size, BLOCKSIZE >> > (output_buffer, max_buffer, output_size, grid_size, MAX);
+
+		// input array is longer than one block
+		if (grid_size > 1)
+		{
+			for (grid_size; grid_size >= 1; grid_size = ceil((float)grid_size / BLOCKSIZE))
+			{
+				reduction_kernel_blocks << <grid_size, BLOCKSIZE >> > (max_buffer, max_buffer, grid_size, ceil((float)grid_size / BLOCKSIZE), MAX);
+				if (grid_size == 1)
+					break;
+			}
+		}
+	}
+	else
+	{
+		// Array is too short for more complicated computation
+		reduction_kernel_warp << <1, output_size >> > (output_buffer, max_buffer, output_size, MAX);
+	}
+
+	cudaDeviceSynchronize();
+
+	float maxValue;
+	cudaMemcpy(&maxValue, max_buffer, sizeof(float), cudaMemcpyDeviceToHost);
+
+	// use previously found maxima to map all values to the range 0-1
+	grid_size = ceil((float)output_size / BLOCKSIZE);
+	normalize_kernel << <grid_size, BLOCKSIZE >> > (output_buffer, output_size, maxValue);
+	cudaDeviceSynchronize();
 
 	// copy results to CPU side
 	std::vector<float> results;
