@@ -1,5 +1,9 @@
 #pragma once
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -62,6 +66,7 @@ int main() {
 	// Compute points of interest
 	std::vector<float> heatmap = compute_heatmap(data_ptr.get()->data);
 
+	//TODO: heatmap texture init
 	int dim = pow(10, 4);
 	unsigned int heatmap_texture;
 	glGenTextures(1, &heatmap_texture);
@@ -72,17 +77,45 @@ int main() {
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim, dim, GL_RED, GL_FLOAT, &heatmap[0]);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	//TODO: imgui init
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 460 core");
+
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//TODO: test imgui
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+
+
 		map_ptr->Draw(heatmap_texture);
+
+		//TODO: test imgui II
+		ImGui::Begin("My name is window, ImGUI window");
+		ImGui::Text("EY YOOOOOO SHEEESH");
+		ImGui::End();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	//Destroy ImGUI context
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwTerminate();
 	return 0;
