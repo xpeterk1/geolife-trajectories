@@ -4,8 +4,8 @@
 #define __CUDA_ARCH__ 860
 #define BLOCKSIZE 256
 
-#define PRECISION 4
-#define KERNEL_SIZE 9
+#define PRECISION 3
+#define KERNEL_SIZE 3
 #define SIGMA 1.0f
 
 #include "cuda_runtime.h"

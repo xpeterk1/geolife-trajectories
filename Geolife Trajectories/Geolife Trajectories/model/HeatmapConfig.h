@@ -5,20 +5,20 @@
 class HeatmapConfig
 {
 public:
-	bool walk = true;
-	bool bike = true;
-	bool bus = true;
-	bool car = true;
-	bool subway = true;
-	bool train = true;
-	bool airplane = true;
-	bool boat = true;
-	bool run = true;
-	bool motorcycle = true;
+	bool walk = false;
+	bool bike = false;
+	bool bus = false;
+	bool car = false;
+	bool subway = false;
+	bool train = false;
+	bool airplane = false;
+	bool boat = false;
+	bool run = false;
+	bool motorcycle = false;
 
 private:
 	// start with all modes enabled
-	int last_mode = 0;
+	int last_mode = 2047;
 
 public:
 	int GetMode();

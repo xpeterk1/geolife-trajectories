@@ -71,7 +71,7 @@ int main() {
 	init_heatmap_data(data_ptr.get()->data);
 
 	// Prepare output texture for heatmap
-	int dim = pow(10, 4);
+	int dim = pow(10, 3);
 	unsigned int heatmap_texture;
 	glGenTextures(1, &heatmap_texture);
 	glBindTexture(GL_TEXTURE_2D, heatmap_texture);
