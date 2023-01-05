@@ -13,7 +13,7 @@ Map::Map() : map_shader("shaders\\map.vert", "shaders\\map.frag")
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
-    scale_factor = 0.8f;
+    scale_factor = 1.0f;
     translation = glm::vec2(0.0f);
     Transform();
 

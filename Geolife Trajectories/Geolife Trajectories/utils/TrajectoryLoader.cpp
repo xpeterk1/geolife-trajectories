@@ -3,7 +3,7 @@
 std::vector<Datapoint> TrajectoryLoader::Load(std::string data_folder_path, bool normalize)
 {
 	data_path = data_folder_path;
-	return Load(data_folder_path, 9999999999, normalize);
+	return Load(data_folder_path, -1, normalize);
 }
 
 std::vector<Datapoint> TrajectoryLoader::Load(std::string data_source_path, int count, bool normalize)
@@ -13,7 +13,7 @@ std::vector<Datapoint> TrajectoryLoader::Load(std::string data_source_path, int 
 
 	if (entry.is_directory())
 		return LoadFromFolder(data_source_path, count, normalize);
-	else if (entry.path().extension() == ".bin")
+	else if (entry.path().extension() == ".bin" || entry.path().extension() == ".dat")
 		return LoadFromBinary(data_source_path, count);
 	else
 		return LoadFromTxt(data_source_path, count, normalize);
@@ -194,22 +194,27 @@ std::vector<Datapoint> TrajectoryLoader::LoadFromFolder(std::string data_folder_
 	return output;
 }
 
-std::vector<Datapoint> TrajectoryLoader::LoadFromBinary(std::string data_folder_path, int count)
+std::vector<Datapoint> TrajectoryLoader::LoadFromBinary(std::string data_file_path, int count)
 {
-	std::ifstream in(data_folder_path, std::ios::binary);
+	FILE* ptr;
+	fopen_s(&ptr, data_file_path.c_str(), "rb");  // r for read, b for binary
 
-	// Read the data from the file
-	std::vector<Datapoint> points;
-	Datapoint p;
-	int counter = 0;
-	while (in >> p) {
-		if (counter == count) break;
-		points.push_back(p);
-		counter++;
+	int elem_count = count;
+	if (count == -1)
+	{
+		// find size of file
+		fseek(ptr, 0L, SEEK_END);
+		long sz = ftell(ptr);
+		fseek(ptr, 0L, SEEK_SET);
+
+		elem_count = sz / sizeof(Datapoint);
 	}
 
-	// Close the file
-	in.close();
+	std::vector<Datapoint> points(elem_count);
+
+	
+	fread(points.data(), sizeof(Datapoint), elem_count, ptr); // read 10 bytes to our buffer
+	fclose(ptr);
 
 	return points;
 }

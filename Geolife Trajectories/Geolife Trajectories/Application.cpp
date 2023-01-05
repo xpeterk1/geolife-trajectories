@@ -3,23 +3,26 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-
 #include <iostream>
+
 #include "opengl/Map.h"
 #include "model/Dataset.h"
+#include "cuda/heatmap.h"
 
 #include "glm/gtx/string_cast.hpp"
 
-#include "cuda/heatmap.h"
+#include <stdio.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 std::unique_ptr<Map> map_ptr;
 std::unique_ptr<Dataset> data_ptr;
-const float zoom_sensitivity = 0.05f;
-const float move_sensitivity = 0.02f;
+const float zoom_sensitivity = 0.1f;
+const float move_sensitivity = 0.05f;
 
 int main() {
 
@@ -40,6 +43,8 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetKeyCallback(window, key_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -47,25 +52,15 @@ int main() {
 	}
 
 	map_ptr = std::make_unique<Map>();
-	data_ptr = std::make_unique<Dataset>("data/data_small.txt",1000000, false);
+	data_ptr = std::make_unique<Dataset>("data/data.bin", true);
 
-	//std::ofstream file("data_small.txt");
-	//for (const auto& point : data_ptr->data) 
-	//{
-	//	file << point.x << " " << point.y << " " << point.time << " " << point.mode << std::endl;
-	//}
-
-	//file.flush();
-	//file.close();
-
+	//FILE* fp;
+	//fopen_s(&fp, "data.bin", "wb");
+	//size_t items_written = fwrite(data_ptr->data.data(), sizeof(Datapoint), data_ptr->size, fp);
+	//fclose(fp);
+	
 	// Compute points of interest
 	std::vector<float> heatmap = compute_heatmap(data_ptr.get()->data);
-
-	int c = 0;
-	for (float f : heatmap)
-	{
-		if (f != 0) c++;
-	}
 
 	int dim = pow(10, 4);
 	unsigned int heatmap_texture;
@@ -106,4 +101,21 @@ void mouse_callback(GLFWwindow* window, double x, double y)
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	map_ptr->AddScale(yoffset * zoom_sensitivity);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_LEFT)
+		map_ptr->Translate(glm::vec2(move_sensitivity,0));
+	if (key == GLFW_KEY_RIGHT)
+		map_ptr->Translate(glm::vec2(-move_sensitivity, 0));
+	if (key == GLFW_KEY_UP)
+		map_ptr->Translate(glm::vec2(0, -move_sensitivity));
+	if (key == GLFW_KEY_DOWN)
+		map_ptr->Translate(glm::vec2(0, move_sensitivity));
 }
