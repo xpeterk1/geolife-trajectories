@@ -70,7 +70,7 @@ int main() {
 	//fclose(fp);
 
 	// Initialize and upload data to cuda
-	init_heatmap_data(data_ptr.get()->data);
+	init_heatmap_data(data_ptr.get()->data, heatmap_config);
 
 	// Prepare output texture for heatmap
 	// MUST BE THE SAME POWER AS PRECISION IN HEATMAP.CU
@@ -108,10 +108,22 @@ int main() {
 		// Draw GUI
 		DrawGUI();
 
+		// Kernel size or sigma changed
+		if (heatmap_config.ReuploadKernel()) 
+		{
+			reinit_kernel(heatmap_config);
+		}
+
 		// Some GUI element changed
 		if (heatmap_config.NeedsRecomputation())
 		{
 			std::vector<float> heatmap = compute_heatmap(heatmap_config);
+			
+			heatmap_config.last_mode = heatmap_config.current_mode;
+			heatmap_config.time_changed = false;
+			heatmap_config.scaling_changed = false;
+			heatmap_config.std_changed = false;
+			heatmap_config.size_changed = false;
 
 			glBindTexture(GL_TEXTURE_2D, heatmap_texture);
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim, dim, GL_RED, GL_FLOAT, &heatmap[0]);
@@ -177,6 +189,13 @@ void DrawGUI()
 {
 	ImGui::Begin("Main Menu");
 
+	ImGui::Text("Kernel Density Estimation");
+	if (ImGui::SliderFloat("STD", &heatmap_config.sigma, 1.0f, 10.0f))
+		heatmap_config.std_changed = true;
+
+	if (ImGui::InputInt("Size", &heatmap_config.kernel_size, 2))
+		heatmap_config.size_changed = true;
+
 	// Checkboxes for transportation modes
 	ImGui::Text("Transportation mode");
 
@@ -214,12 +233,13 @@ void DrawGUI()
 		heatmap_config.Switch(MOTORCYCLE);
 	ImGui::Spacing();
 
-	static float begin = 10, end = 90;
-	ImGui::DragFloatRange2("Time", &begin, &end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%");
+	if (ImGui::DragIntRange2("Time [s]", &heatmap_config.min_time, &heatmap_config.max_time, 100, 0, 86400, "Min: %i", "Max: %i"))
+		heatmap_config.time_changed = true;
 	
 	ImGui::Spacing();
 	
-	ImGui::Checkbox("Use Log Scale", &heatmap_config.use_log_scale);
+	if (ImGui::Checkbox("Use Log Scale", &heatmap_config.use_log_scale))
+		heatmap_config.scaling_changed = true;
 
 	ImGui::Spacing();
 	if (ImGui::Button("Reset Map"))

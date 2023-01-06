@@ -5,8 +5,6 @@
 #define BLOCKSIZE 256
 
 #define PRECISION 3
-#define KERNEL_SIZE 5
-#define SIGMA 1.0f
 
 #include "cuda_runtime.h"
 #include "device_atomic_functions.h"
@@ -40,7 +38,7 @@ __device__ static inline float max_function(float& x, float& y)
 
 #pragma region Kernels
 
-__global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int kernel_size, float* output_data, int precision, int mode_mask)
+__global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int kernel_size, float* output_data, int precision, int mode_mask, int min_time, int max_time)
 {
 	int global_id = threadIdx.x + blockDim.x * blockIdx.x;
 	int output_size = pow(10, precision);
@@ -64,6 +62,9 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 		if ((mode_mask & RUN) == 0 && point.mode == RUN) return;
 		if ((mode_mask & MOTORCYCLE) == 0 && point.mode == MOTORCYCLE) return;
 	}
+
+	// filter time
+	if (point.time < min_time || point.time > max_time) return;
 
 	// find corresponding (x, y) coordinates in the output_data
 	// AND SWITCH X AND Y
@@ -200,7 +201,7 @@ __global__ void normalize_kernel(float* data, int N, float max)
 
 #pragma endregion
 
-void init_heatmap_data(std::vector<Datapoint> points) 
+void init_heatmap_data(std::vector<Datapoint> points, HeatmapConfig& config) 
 {
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop, 0);
@@ -210,15 +211,9 @@ void init_heatmap_data(std::vector<Datapoint> points)
 	int output_size = pow(pow(10, PRECISION), 2);
 
 	int size_bytes = n * sizeof(Datapoint);
-	int kernel_size_bytes = pow(KERNEL_SIZE, 2) * sizeof(float);
-
-	auto gauss_kernel = get_gaussian_kernel(SIGMA, KERNEL_SIZE);
 
 	cudaMalloc((void**)&input_buffer, size_bytes);
 	cudaMemcpy(input_buffer, &points[0], size_bytes, cudaMemcpyHostToDevice);
-
-	cudaMalloc((void**)&kernel_buffer, kernel_size_bytes);
-	cudaMemcpy(kernel_buffer, &gauss_kernel[0], kernel_size_bytes, cudaMemcpyHostToDevice);
 
 	// malloc output data float array of size (10^p)x(10^p)
 	int output_size_bytes = output_size * sizeof(float);
@@ -226,6 +221,8 @@ void init_heatmap_data(std::vector<Datapoint> points)
 
 	int grid_size = ceil((float)n / BLOCKSIZE);
 	cudaMalloc((void**)&max_buffer, grid_size * sizeof(float));
+
+	reinit_kernel(config);
 }
 
 void free_heatmap_data() 
@@ -247,7 +244,7 @@ std::vector<float> compute_heatmap(HeatmapConfig& config)
 	int blocks = (floor(n) / BLOCKSIZE) + 1;
 
 	// perform kernel density estimation
-	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, KERNEL_SIZE, output_buffer, PRECISION, config.current_mode);
+	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, config.kernel_size, output_buffer, PRECISION, config.current_mode, config.min_time, config.max_time);
 	
 	if (config.use_log_scale && config.current_mode != 0)
 		log_kernel << <blocks, BLOCKSIZE >> > (output_buffer, output_size);
@@ -295,4 +292,14 @@ std::vector<float> compute_heatmap(HeatmapConfig& config)
 	cudaMemcpy(&results[0], output_buffer, output_size_bytes, cudaMemcpyDeviceToHost);
 
 	return results;
+}
+
+void reinit_kernel(HeatmapConfig& config)
+{
+	cudaFree(kernel_buffer);
+	int kernel_size_bytes = pow(config.kernel_size, 2) * sizeof(float);
+	auto gauss_kernel = get_gaussian_kernel(config.sigma, config.kernel_size);
+
+	cudaMalloc((void**)&kernel_buffer, kernel_size_bytes);
+	cudaMemcpy(kernel_buffer, &gauss_kernel[0], kernel_size_bytes, cudaMemcpyHostToDevice);
 }
