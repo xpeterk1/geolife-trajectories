@@ -16,14 +16,15 @@ public:
 	bool boat = false;
 	bool run = false;
 	bool motorcycle = false;
+	bool use_log_scale = true;
+	int current_mode = 0;
 
 private:
 	int last_mode = 2047;
-	int current_mode = 0;
 
 public:
 	void Switch(TransportationMode mode);
-	bool NeedsRecomputation(int* newMode);
+	bool NeedsRecomputation();
 
 private:
 

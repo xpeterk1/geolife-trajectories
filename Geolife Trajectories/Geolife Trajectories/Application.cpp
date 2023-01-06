@@ -109,10 +109,9 @@ int main() {
 		DrawGUI();
 
 		// Some GUI element changed
-		int newMode = 0;
-		if (heatmap_config.NeedsRecomputation(&newMode))
+		if (heatmap_config.NeedsRecomputation())
 		{
-			std::vector<float> heatmap = compute_heatmap(newMode);
+			std::vector<float> heatmap = compute_heatmap(heatmap_config);
 
 			glBindTexture(GL_TEXTURE_2D, heatmap_texture);
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dim, dim, GL_RED, GL_FLOAT, &heatmap[0]);
@@ -213,6 +212,11 @@ void DrawGUI()
 
 	if (ImGui::Checkbox("Motorcycle", &heatmap_config.motorcycle))
 		heatmap_config.Switch(MOTORCYCLE);
+
+	static float begin = 10, end = 90;
+	ImGui::DragFloatRange2("Time", &begin, &end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%");
+
+	ImGui::Checkbox("Use Log Scale", &heatmap_config.use_log_scale);
 
 	if (ImGui::Button("Reset Map"))
 		map_ptr->Reset();

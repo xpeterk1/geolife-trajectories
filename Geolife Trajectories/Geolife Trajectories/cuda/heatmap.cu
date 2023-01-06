@@ -179,6 +179,16 @@ __global__ void reduction_kernel_blocks(float* data, float* output, int N, int n
 	}
 }
 
+__global__ void log_kernel(float* data, int N) 
+{
+	int global_id = threadIdx.x + blockDim.x * blockIdx.x;
+
+	if (global_id > N) return;
+
+	if (data[global_id] != 0.0f)
+		data[global_id] = log(data[global_id]);
+}
+
 __global__ void normalize_kernel(float* data, int N, float max)
 {
 	int global_id = threadIdx.x + blockDim.x * blockIdx.x;
@@ -227,7 +237,7 @@ void free_heatmap_data()
 	cudaFree(max_buffer);
 }
 
-std::vector<float> compute_heatmap(int mode_mask)
+std::vector<float> compute_heatmap(HeatmapConfig& config)
 {
 	int output_size = pow(pow(10, PRECISION), 2);
 	int output_size_bytes = output_size * sizeof(float);
@@ -237,7 +247,11 @@ std::vector<float> compute_heatmap(int mode_mask)
 	int blocks = (floor(n) / BLOCKSIZE) + 1;
 
 	// perform kernel density estimation
-	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, KERNEL_SIZE, output_buffer, PRECISION, mode_mask);
+	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, KERNEL_SIZE, output_buffer, PRECISION, config.current_mode);
+	
+	if (config.use_log_scale && config.current_mode != 0)
+		log_kernel << <blocks, BLOCKSIZE >> > (output_buffer, output_size);
+	
 	cudaDeviceSynchronize();
 
 	// using parallel reduction, find maximal value in output_buffer

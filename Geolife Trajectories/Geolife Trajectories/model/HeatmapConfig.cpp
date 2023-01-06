@@ -1,17 +1,9 @@
 #include "HeatmapConfig.h"
 
-bool HeatmapConfig::NeedsRecomputation(int* newMode)
+bool HeatmapConfig::NeedsRecomputation()
 {
 	// Recomputation is needed when current states of bools do not match previous mode
-
-	if (current_mode != last_mode)
-	{
-		last_mode = current_mode;
-		*newMode = current_mode;
-		return true;
-	}
-
-	return false;
+	return current_mode != last_mode;
 }
 
 void HeatmapConfig::Switch(TransportationMode mode)
