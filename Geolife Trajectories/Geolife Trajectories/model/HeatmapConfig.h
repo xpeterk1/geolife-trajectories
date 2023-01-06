@@ -5,6 +5,7 @@
 class HeatmapConfig
 {
 public:
+	bool unknown = false;
 	bool walk = false;
 	bool bike = false;
 	bool bus = false;

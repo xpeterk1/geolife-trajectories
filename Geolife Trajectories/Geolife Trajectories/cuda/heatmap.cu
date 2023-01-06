@@ -52,6 +52,7 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 	// filtering applied, 2047 = all bits sets to 1 => all present, no filtering
 	if (mode_mask != 2047)
 	{
+		if ((mode_mask & UNKNOWN) == 0 && point.mode == UNKNOWN) return;
 		if ((mode_mask & WALK) == 0 && point.mode == WALK) return;
 		if ((mode_mask & BIKE) == 0 && point.mode == BIKE) return;
 		if ((mode_mask & BUS) == 0 && point.mode == BUS) return;
@@ -62,7 +63,6 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 		if ((mode_mask & BOAT) == 0 && point.mode == BOAT) return;
 		if ((mode_mask & RUN) == 0 && point.mode == RUN) return;
 		if ((mode_mask & MOTORCYCLE) == 0 && point.mode == MOTORCYCLE) return;
-		if (point.mode == UNKNOWN) return;
 	}
 
 	// find corresponding (x, y) coordinates in the output_data

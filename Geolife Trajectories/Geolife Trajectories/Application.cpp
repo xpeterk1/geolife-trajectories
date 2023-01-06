@@ -177,6 +177,9 @@ void DrawGUI()
 	// Checkboxes for transportation modes
 	ImGui::Text("Transportation mode");
 
+	if (ImGui::Checkbox("Unknown", &heatmap_config.unknown))
+		heatmap_config.Switch(UNKNOWN);
+
 	if (ImGui::Checkbox("Walk", &heatmap_config.walk))
 		heatmap_config.Switch(WALK);
 
