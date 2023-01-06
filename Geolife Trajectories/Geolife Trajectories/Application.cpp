@@ -120,7 +120,7 @@ int main() {
 		}
 
 		// Draw map with heatmap and Lookup table
-		map_ptr->Draw(heatmap_texture);
+		map_ptr->Draw(heatmap_texture, lut_texture);
 
 		// Render GUI
 		ImGui::Render();

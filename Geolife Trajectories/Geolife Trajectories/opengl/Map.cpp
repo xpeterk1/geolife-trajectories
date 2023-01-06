@@ -26,13 +26,14 @@ Map::~Map()
     glDeleteTextures(1, &texture_id);
 }
 
-void Map::Draw(unsigned int heatmap_texture_id)
+void Map::Draw(unsigned int heatmap_texture_id, unsigned int lut_texture)
 {
     map_shader.use();
     glm::mat4 modelMat = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(this->translation, 0.0f)), glm::vec3(scale_factor));
     map_shader.setMat4F("modelMatrix", modelMat);
     map_shader.setInt("map_texture", 0);
     map_shader.setInt("heatmap_texture", 1);
+    map_shader.setInt("lut_texture", 2);
     
     glBindVertexArray(vao);
     
@@ -41,6 +42,9 @@ void Map::Draw(unsigned int heatmap_texture_id)
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, heatmap_texture_id);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, lut_texture);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     
