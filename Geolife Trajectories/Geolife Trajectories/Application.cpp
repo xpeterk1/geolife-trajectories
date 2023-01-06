@@ -38,6 +38,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	GLFWwindow* window = glfwCreateWindow(800, 800, "Geolife Trajectories", NULL, NULL);
 
@@ -71,6 +72,7 @@ int main() {
 	init_heatmap_data(data_ptr.get()->data);
 
 	// Prepare output texture for heatmap
+	// MUST BE THE SAME POWER AS PRECISION IN HEATMAP.CU
 	int dim = pow(10, 3);
 	unsigned int heatmap_texture;
 	glGenTextures(1, &heatmap_texture);

@@ -15,7 +15,6 @@ Map::Map() : map_shader("shaders\\map.vert", "shaders\\map.frag")
 
     scale_factor = 1.0f;
     translation = glm::vec2(0.0f);
-    Transform();
 
     texture_id = TextureLoader().LoadTextureFromFile("resources\\map.png");
 }
@@ -60,27 +59,15 @@ void Map::AddScale(float scale_factor)
     this->scale_factor += scale_factor;
 
     if (this->scale_factor < 1) this->scale_factor = 1;
-
-    Transform();
 }
 
 void Map::Translate(glm::vec2 direction)
 {    
     this->targetTranslation = this->translation + direction;
-
-    Transform();
-}
-
-void Map::Transform() 
-{
-    map_shader.use();
-    //glm::mat4 modelMat = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(this->translation, 0.0f)), glm::vec3(scale_factor));
-    //map_shader.setMat4F("modelMatrix", modelMat);
 }
 
 void Map::Reset() 
 {
     scale_factor = 1;
-    translation = glm::vec2(0.0f);
-    Transform();
+    targetTranslation = glm::vec2(0.0f);
 }
