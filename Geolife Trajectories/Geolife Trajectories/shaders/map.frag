@@ -15,7 +15,7 @@ void main()
 
 	vec3 color;
 	if (heatmap_color.r != 0)
-		color = 0.1 * map_color.xyz + 0.9 * lut_color.xyz;
+		color = 0.3 * map_color.xyz + 0.7 * lut_color.xyz;
 	else 
 		color = map_color.xyz;
 
