@@ -5,7 +5,7 @@
 #define BLOCKSIZE 256
 
 #define PRECISION 3
-#define KERNEL_SIZE 3
+#define KERNEL_SIZE 5
 #define SIGMA 1.0f
 
 #include "cuda_runtime.h"
