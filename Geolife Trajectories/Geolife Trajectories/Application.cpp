@@ -212,12 +212,16 @@ void DrawGUI()
 
 	if (ImGui::Checkbox("Motorcycle", &heatmap_config.motorcycle))
 		heatmap_config.Switch(MOTORCYCLE);
+	ImGui::Spacing();
 
 	static float begin = 10, end = 90;
 	ImGui::DragFloatRange2("Time", &begin, &end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%");
-
+	
+	ImGui::Spacing();
+	
 	ImGui::Checkbox("Use Log Scale", &heatmap_config.use_log_scale);
 
+	ImGui::Spacing();
 	if (ImGui::Button("Reset Map"))
 		map_ptr->Reset();
 
