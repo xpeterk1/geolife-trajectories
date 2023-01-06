@@ -192,6 +192,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="shaders\lut.frag" />
+    <None Include="shaders\lut.vert" />
     <None Include="shaders\map.frag" />
     <None Include="shaders\map.vert" />
   </ItemGroup>

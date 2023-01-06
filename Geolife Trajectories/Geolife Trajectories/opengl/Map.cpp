@@ -23,6 +23,7 @@ Map::~Map()
 {
 	glDeleteBuffers(1, &vao);
 	glDeleteBuffers(1, &vbo);
+    glDeleteTextures(1, &texture_id);
 }
 
 void Map::Draw(unsigned int heatmap_texture_id)

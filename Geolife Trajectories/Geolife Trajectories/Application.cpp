@@ -29,6 +29,7 @@ std::unique_ptr<Map> map_ptr;
 std::unique_ptr<Dataset> data_ptr;
 const float zoom_sensitivity = 0.1f;
 const float move_sensitivity = 0.075f;
+GLuint lut_texture;
 
 HeatmapConfig heatmap_config;
 
@@ -74,13 +75,16 @@ int main() {
 	// Prepare output texture for heatmap
 	// MUST BE THE SAME POWER AS PRECISION IN HEATMAP.CU
 	int dim = pow(10, 3);
-	unsigned int heatmap_texture;
+	GLuint heatmap_texture;
 	glGenTextures(1, &heatmap_texture);
 	glBindTexture(GL_TEXTURE_2D, heatmap_texture);
 	glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, dim, dim);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Load lookup table texture
+	lut_texture = TextureLoader().LoadTextureFromFile("resources/lut.png");
 
 	//Init ImGUI
 	IMGUI_CHECKVERSION();
@@ -115,7 +119,7 @@ int main() {
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		// Draw map with heatmap
+		// Draw map with heatmap and Lookup table
 		map_ptr->Draw(heatmap_texture);
 
 		// Render GUI
@@ -213,5 +217,19 @@ void DrawGUI()
 	if (ImGui::Button("Reset Map"))
 		map_ptr->Reset();
 
+	ImGui::End();
+
+	// LOOKUP TABLE
+	bool open = true;
+	ImGui::Begin("LUT", &open, ImGuiWindowFlags_NoTitleBar);
+	auto windowWidth = ImGui::GetWindowSize().x;
+	auto textWidth = ImGui::CalcTextSize("0").x;
+
+	ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+	ImGui::BeginGroup();
+	ImGui::Text("1");
+	ImGui::Image((void*)(intptr_t)lut_texture, ImVec2(10, 200));
+	ImGui::Text("0");
+	ImGui::EndGroup();
 	ImGui::End();
 }
