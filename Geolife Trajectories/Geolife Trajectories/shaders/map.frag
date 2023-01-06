@@ -13,7 +13,7 @@ void main()
 	
 	vec3 color;
 	if (heatmap_color.r != 0)
-		color = heatmap_color.xyz;
+		color = 0.2 * map_color.xyz + 0.8 * heatmap_color.xyz;
 	else 
 		color = map_color.xyz;
 
