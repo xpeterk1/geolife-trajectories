@@ -176,16 +176,36 @@ void DrawGUI()
 
 	// Checkboxes for transportation modes
 	ImGui::Text("Transportation mode");
-	ImGui::Checkbox("Walk", &heatmap_config.walk);
-	ImGui::Checkbox("Bike", &heatmap_config.bike);
-	ImGui::Checkbox("Bus", &heatmap_config.bus);
-	ImGui::Checkbox("Car", &heatmap_config.car);
-	ImGui::Checkbox("Subway", &heatmap_config.subway);
-	ImGui::Checkbox("Train", &heatmap_config.train);
-	ImGui::Checkbox("Airplane", &heatmap_config.airplane);
-	ImGui::Checkbox("Boat", &heatmap_config.boat);
-	ImGui::Checkbox("Run", &heatmap_config.run);
-	ImGui::Checkbox("Motorcycle", &heatmap_config.motorcycle);
+
+	if (ImGui::Checkbox("Walk", &heatmap_config.walk))
+		heatmap_config.Switch(WALK);
+
+	if (ImGui::Checkbox("Bike", &heatmap_config.bike))
+		heatmap_config.Switch(BIKE);
+
+	if (ImGui::Checkbox("Bus", &heatmap_config.bus))
+		heatmap_config.Switch(BUS);
+	
+	if (ImGui::Checkbox("Car", &heatmap_config.car))
+		heatmap_config.Switch(CAR);
+	
+	if (ImGui::Checkbox("Subway", &heatmap_config.subway))
+		heatmap_config.Switch(SUBWAY);
+
+	if (ImGui::Checkbox("Train", &heatmap_config.train))
+		heatmap_config.Switch(TRAIN);
+
+	if (ImGui::Checkbox("Airplane", &heatmap_config.airplane))
+		heatmap_config.Switch(AIRPLANE);
+	
+	if (ImGui::Checkbox("Boat", &heatmap_config.boat))
+		heatmap_config.Switch(BOAT);
+
+	if (ImGui::Checkbox("Run", &heatmap_config.run))
+		heatmap_config.Switch(RUN);
+
+	if (ImGui::Checkbox("Motorcycle", &heatmap_config.motorcycle))
+		heatmap_config.Switch(MOTORCYCLE);
 
 	if (ImGui::Button("Reset Map"))
 		map_ptr->Reset();

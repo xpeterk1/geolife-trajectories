@@ -17,11 +17,11 @@ public:
 	bool motorcycle = false;
 
 private:
-	// start with all modes enabled
 	int last_mode = 2047;
+	int current_mode = 0;
 
 public:
-	int GetMode();
+	void Switch(TransportationMode mode);
 	bool NeedsRecomputation(int* newMode);
 
 private:
