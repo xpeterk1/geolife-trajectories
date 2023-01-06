@@ -15,6 +15,7 @@ private:
 	Shader map_shader;
 	float scale_factor = 1;
 	glm::vec2 translation;
+	glm::vec2 targetTranslation;
 
 	const glm::vec3 square[4]
 	{

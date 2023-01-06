@@ -28,7 +28,7 @@ void DrawGUI();
 std::unique_ptr<Map> map_ptr;
 std::unique_ptr<Dataset> data_ptr;
 const float zoom_sensitivity = 0.1f;
-const float move_sensitivity = 0.05f;
+const float move_sensitivity = 0.075f;
 
 HeatmapConfig heatmap_config;
 
@@ -158,8 +158,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (action != GLFW_PRESS) return;
-
 	if (key == GLFW_KEY_LEFT)
 		map_ptr->Translate(glm::vec2(move_sensitivity,0));
 	if (key == GLFW_KEY_RIGHT)

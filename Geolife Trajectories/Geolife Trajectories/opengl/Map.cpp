@@ -29,6 +29,8 @@ Map::~Map()
 void Map::Draw(unsigned int heatmap_texture_id)
 {
     map_shader.use();
+    glm::mat4 modelMat = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(this->translation, 0.0f)), glm::vec3(scale_factor));
+    map_shader.setMat4F("modelMatrix", modelMat);
     map_shader.setInt("map_texture", 0);
     map_shader.setInt("heatmap_texture", 1);
     
@@ -45,6 +47,12 @@ void Map::Draw(unsigned int heatmap_texture_id)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    if (this->targetTranslation != this->translation) {
+        auto dir = this->targetTranslation - this->translation;
+
+        this->translation += dir * 0.1f;
+    }
 }
 
 void Map::AddScale(float scale_factor) 
@@ -57,16 +65,17 @@ void Map::AddScale(float scale_factor)
 }
 
 void Map::Translate(glm::vec2 direction)
-{
-    this->translation += direction;
+{    
+    this->targetTranslation = this->translation + direction;
+
     Transform();
 }
 
 void Map::Transform() 
 {
     map_shader.use();
-    glm::mat4 modelMat = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(this->translation, 0.0f)), glm::vec3(scale_factor));
-    map_shader.setMat4F("modelMatrix", modelMat);
+    //glm::mat4 modelMat = glm::scale(glm::translate(glm::mat4(1.0), glm::vec3(this->translation, 0.0f)), glm::vec3(scale_factor));
+    //map_shader.setMat4F("modelMatrix", modelMat);
 }
 
 void Map::Reset() 
