@@ -64,7 +64,7 @@ __global__ void kde_kernel(Datapoint* points, int n_point, float* kernel, int ke
 	}
 
 	// filter time
-	if (point.time < min_time || point.time > max_time) return;
+	if (mode_mask != 0 && (point.time < min_time || point.time > max_time)) return;
 
 	// find corresponding (x, y) coordinates in the output_data
 	// AND SWITCH X AND Y

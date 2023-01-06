@@ -190,7 +190,7 @@ void DrawGUI()
 	ImGui::Begin("Main Menu");
 
 	ImGui::Text("Kernel Density Estimation");
-	if (ImGui::SliderFloat("STD", &heatmap_config.sigma, 1.0f, 10.0f))
+	if (ImGui::SliderFloat("Sigma", &heatmap_config.sigma, 1.0f, 10.0f))
 		heatmap_config.std_changed = true;
 
 	if (ImGui::InputInt("Size", &heatmap_config.kernel_size, 2))
