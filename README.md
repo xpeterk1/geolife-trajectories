@@ -9,18 +9,13 @@ The dataset includes a total of 24 876 978 points. However, in this project, onl
 
 Seventy-three users labelled their trajectory data using ten different transportation modes: walk, bike, bus, car, subway, train, aeroplane, boat, run and motorcycle. However, most data remained unlabeled and were assigned the mode unknown.
 
-----
 ## Visualization
 
 This project uses the Kernel Density Estimation approach to compute a popularity heatmap. The kernel is a standard square discrete Gaussian kernel with the size and sigma parameter according to the values input in the GUI. First, for each point, a Gaussian kernel is accumulated in the buffer. Afterwards, a maximal value in the heatmap buffer is extracted using parallel GPU aggregation. This found value is then used to normalise the data. As seen in Figure 2, the data points in the dataset are unevenly distributed and accumulated in one area. This results in a visualisation that only shows different shades in one location. To eliminate this problem, an option to use a logarithmic scale was added (Figure 1).
 
-----
-
 ## Implementation
 
 This project was implemented using C++. Rendering was done using OpenGL 4.6 with a GUI library [ImGui](https://github.com/ocornut/imgui) . Background processing is implemented using CUDA 11. As this implementation relies on atomic operations, the minimal required compute capability is 6.0.
-
-----
 
 ## User Guide
 
@@ -35,8 +30,6 @@ Two main parameters for the KDE algorithm are the size of the kernel and sigma. 
 #### Data Filtering
 
 In the section Transportation mode, the user can filter what type of transportation he wants to observe on the map. A checked box means that the transportation mode will be drawn. Under the checkmarks for the transportation mode, the user can use two sliders to filter the time interval in which the points should be.
-
-----
 
 ## Demo
 
