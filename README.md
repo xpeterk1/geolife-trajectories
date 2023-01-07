@@ -1,3 +1,5 @@
+# Geolife Trajectories
+
 ## Introduction
 
 This project targets a real-time visualisation of the dataset provided by Microsoft Asia
