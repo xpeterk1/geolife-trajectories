@@ -193,8 +193,12 @@ void DrawGUI()
 	if (ImGui::SliderFloat("Sigma", &heatmap_config.sigma, 1.0f, 10.0f))
 		heatmap_config.std_changed = true;
 
-	if (ImGui::InputInt("Size", &heatmap_config.kernel_size, 2))
+	if (ImGui::InputInt("Size", &heatmap_config.kernel_size, 2, 10))
+	{
 		heatmap_config.size_changed = true;
+		if (heatmap_config.kernel_size % 2 != 1) heatmap_config.kernel_size++;
+		if (heatmap_config.kernel_size < 1) heatmap_config.kernel_size = 1;
+	}
 
 	// Checkboxes for transportation modes
 	ImGui::Text("Transportation mode");
@@ -233,7 +237,7 @@ void DrawGUI()
 		heatmap_config.Switch(MOTORCYCLE);
 	ImGui::Spacing();
 
-	if (ImGui::DragIntRange2("Time [s]", &heatmap_config.min_time, &heatmap_config.max_time, 100, 0, 86400, "Min: %i", "Max: %i"))
+	if (ImGui::DragIntRange2("Time [s]", &heatmap_config.min_time, &heatmap_config.max_time, 100, 0, 86400, "Min: %i", "Max: %i", ImGuiSliderFlags_NoInput))
 		heatmap_config.time_changed = true;
 	
 	ImGui::Spacing();

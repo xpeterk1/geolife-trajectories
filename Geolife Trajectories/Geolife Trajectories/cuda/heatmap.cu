@@ -246,7 +246,8 @@ std::vector<float> compute_heatmap(HeatmapConfig& config)
 	// perform kernel density estimation
 	kde_kernel << < blocks, BLOCKSIZE >> > (input_buffer, n, kernel_buffer, config.kernel_size, output_buffer, PRECISION, config.current_mode, config.min_time, config.max_time);
 	
-	if (config.use_log_scale && config.current_mode != 0)
+	// apply log scaling only if a) allowed b) some points present
+	if (config.use_log_scale && config.current_mode != 0 && config.current_mode != 1024)
 		log_kernel << <blocks, BLOCKSIZE >> > (output_buffer, output_size);
 	
 	cudaDeviceSynchronize();
